@@ -41,6 +41,6 @@ jobs:
           python main.py
 
       - name: commit symbols
-      - uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: ${{ steps.date.outputs.date }}
