@@ -1,7 +1,7 @@
 name: Gently fetch all yf Symbols via sitemap.xml
 
 on:
-  - workflow_dispatch
+  - workflow_dispatch:
   - schedule:
       - cron: "0 12 * * *"
 
