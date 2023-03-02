@@ -2,7 +2,11 @@ from usp.tree import sitemap_tree_for_homepage
 from urllib.parse import unquote
 
 
-if __name__ == '__main__':
+import click
+
+@click.command()
+@click.option('-o', '--out-file', type=str, help='file where all symbols are written to')
+def fetch_symbols(out_file):
     symbols = set()
 
     sitemap_tree = sitemap_tree_for_homepage('https://finance.yahoo.com')
@@ -13,8 +17,12 @@ if __name__ == '__main__':
 
     symbols = sorted(symbols)
 
-    with open('yfinance.symbols', 'w') as f:
+    with open(out_file, 'w') as f:
         for s in symbols:
             f.write(s + '\n')
 
     print("saved", len(symbols), "symbols")
+
+
+if __name__ == '__main__':
+    fetch_symbols()

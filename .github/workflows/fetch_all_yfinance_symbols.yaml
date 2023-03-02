@@ -3,20 +3,23 @@ name: Gently fetch all yf Symbols via sitemap.xml
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 12 * * *"
+    #        ┌───────────── Minute (0 - 59)
+    #        │ ┌───────────── Hour (0 - 23)
+    #        │ │ ┌───────────── Day of Month (1 - 31)
+    #        │ │ │ ┌───────────── Month (1 - 12)
+    #        │ │ │ │ ┌───────────── Weekday (0 - 6)
+    #        │ │ │ │ │
+    #        * * * * *
+    - cron: "0 2 * * 1"
 
 jobs:
-  build:
+  symbols:
 
     runs-on: ubuntu-latest
 
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
       contents: write
-
-    strategy:
-      matrix:
-        python-version: ["3.9"]
 
     steps:
       - name: Get current date
@@ -26,10 +29,10 @@ jobs:
       - name: checkout source
         uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.9"
 
       - name: Install dependencies
         run: |
@@ -38,9 +41,48 @@ jobs:
 
       - name: download sitemap
         run: |
-          python main.py
+          python fetch/yfsymbols.py -o ./data/yfinance.symbols
 
       - name: commit symbols
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: ${{ steps.date.outputs.date }}
+
+  quote-type:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+      contents: write
+
+    strategy:
+      matrix:
+        shards: ["0-65", "65-130", "130-195", "195-255"]
+
+    steps:
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: checkout source
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: download quote type
+      run: |
+        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --fetch-shards ${{ matrix.shards }}
+
+    - name: commit symbols
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: ${{ steps.date.outputs.date }}
