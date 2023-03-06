@@ -56,10 +56,6 @@ jobs:
       # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
       contents: write
 
-    strategy:
-      matrix:
-        shards: ["0-65", "65-130", "130-195", "195-255"]
-
     steps:
     - name: Get current date
       id: date
@@ -80,11 +76,9 @@ jobs:
 
     - name: download quote type
       run: |
-        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --fetch-shards ${{ matrix.shards }}
+        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --threads 32
 
     - name: commit symbols
-      uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
+      uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        message: ${{ steps.date.outputs.date }}
-        pull: '--ff'
-        push: true
+        commit_message: ${{ steps.date.outputs.date }}
