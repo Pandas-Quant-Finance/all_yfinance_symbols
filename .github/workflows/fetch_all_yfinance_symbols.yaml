@@ -83,6 +83,8 @@ jobs:
         python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --fetch-shards ${{ matrix.shards }}
 
     - name: commit symbols
-      uses: stefanzweifel/git-auto-commit-action@v4
+      uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
       with:
-        commit_message: ${{ steps.date.outputs.date }}
+        message: ${{ steps.date.outputs.date }}
+        pull: '--ff'
+        push: true
