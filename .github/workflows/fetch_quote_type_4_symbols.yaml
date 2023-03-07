@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  quote-type:
+  quote-type-0-100:
     needs: symbols
     runs-on: ubuntu-latest
     permissions:
@@ -33,7 +33,73 @@ jobs:
 
     - name: download quote type
       run: |
-        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --threads 32
+        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --threads 32 --fetch-shards 0-100
+
+    - name: commit symbols
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: ${{ steps.date.outputs.date }}
+
+  quote-type-100-200:
+    needs: symbols
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Give the default GITHUB_TOKEN write permission to commit and push the changed files
+
+    steps:
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: checkout source
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: download quote type
+      run: |
+        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --threads 32 --fetch-shards 100-200
+
+    - name: commit symbols
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: ${{ steps.date.outputs.date }}
+
+  quote-type-200-300:
+    needs: symbols
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Give the default GITHUB_TOKEN write permission to commit and push the changed files
+
+    steps:
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+    - name: checkout source
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: download quote type
+      run: |
+        python fetch/yfquotetype.py -f ./data/yfinance.symbols -o ./data/quote_type --threads 32 --fetch-shards 200-300
 
     - name: commit symbols
       uses: stefanzweifel/git-auto-commit-action@v4
