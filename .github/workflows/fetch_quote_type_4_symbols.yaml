@@ -40,6 +40,7 @@ jobs:
         commit_message: ${{ steps.date.outputs.date }}
 
   quote-type-100-200:
+    needs: quote-type-0-100
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Give the default GITHUB_TOKEN write permission to commit and push the changed files
@@ -72,6 +73,7 @@ jobs:
         commit_message: ${{ steps.date.outputs.date }}
 
   quote-type-200-300:
+    needs: quote-type-100-200
     runs-on: ubuntu-latest
     permissions:
       contents: write  # Give the default GITHUB_TOKEN write permission to commit and push the changed files
