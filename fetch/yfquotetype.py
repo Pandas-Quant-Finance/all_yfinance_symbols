@@ -5,6 +5,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
+from time import sleep
 
 import click
 import pandas as pd
@@ -78,7 +79,12 @@ def shard_range_parser(fetch_shards):
 
 
 def get_quote_type(symbol):
-    return yq.Ticker(symbol).quote_type
+    for i in range(0, 6):
+        try:
+            return yq.Ticker(symbol).quote_type
+        except Exception as e:
+            print("retry", symbol, i)
+            sleep(i ** 3)
 
 
 if __name__ == '__main__':
